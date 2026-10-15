@@ -1,63 +1,464 @@
 {
-  "materias": {
-    "rota": "POST /materias",
-    "visibilidade": "privado",
-
-    "campos_obrigatorios": [
-      "nome"
-    ],
-
-    "exemplo_valido": {
-      "nome": "Matemática",
-      "descricao": "Estudar funções",
-      "professor": "Carlos",
-      "carga_horaria": 60
+  "versao": 1,
+  "tema": "Organização de Estudos",
+  "descricao": "Usuários cadastram matérias e tarefas. Cada usuário vê e gerencia suas próprias matérias e tarefas.",
+  "rotas": [
+    {
+      "metodo": "GET",
+      "caminho": "/materias",
+      "acesso": "logado",
+      "descricao": "Lista todas as matérias do usuário logado.",
+      "exemplos": [
+        {
+          "descricao": "Lista as matérias",
+          "requisicao": null,
+          "resposta": [
+            {
+              "id": 1,
+              "nome": "Matemática",
+              "descricao": "Estudar funções",
+              "professor": "Carlos",
+              "carga_horaria": 60,
+              "usuarioId": 3
+            }
+          ],
+          "status": 200
+        }
+      ]
     },
-
-    "exemplo_invalido": {
-      "nome": "",
-      "descricao": "Estudar funções",
-      "carga_horaria": -5
+    {
+      "metodo": "GET",
+      "caminho": "/materias/:id",
+      "acesso": "dono",
+      "descricao": "Detalha uma matéria. Só o dono pode.",
+      "exemplos": [
+        {
+          "descricao": "Matéria existe",
+          "requisicao": null,
+          "resposta": {
+            "id": 1,
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60,
+            "usuarioId": 3
+          },
+          "status": 200
+        },
+        {
+          "descricao": "Matéria não existe",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Matéria não encontrada"
+          },
+          "status": 404
+        }
+      ]
     },
-
-    "regras": [
-      "O nome é obrigatório.",
-      "A carga horária deve ser maior que zero.",
-      "Cada matéria pertence a um usuário.",
-      "Somente o dono pode editar ou remover a matéria."
-    ]
-  },
-
-  "tarefas": {
-    "rota": "POST /tarefas",
-    "visibilidade": "privado",
-
-    "campos_obrigatorios": [
-      "titulo",
-      "materia_id"
-    ],
-
-    "exemplo_valido": {
-      "titulo": "Resolver exercícios",
-      "descricao": "Resolver questões sobre funções",
-      "data_entrega": "2026-10-20",
-      "status": "pendente",
-      "materia_id": 1
+    {
+      "metodo": "POST",
+      "caminho": "/materias",
+      "acesso": "logado",
+      "descricao": "Cadastra uma matéria. O dono é quem está logado.",
+      "exemplos": [
+        {
+          "descricao": "Dados válidos",
+          "requisicao": {
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60
+          },
+          "resposta": {
+            "id": 1,
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60,
+            "usuarioId": 3
+          },
+          "status": 201
+        },
+        {
+          "descricao": "Falta o nome",
+          "requisicao": {
+            "descricao": "Estudar funções",
+            "carga_horaria": 60
+          },
+          "resposta": {
+            "erro": "Campo obrigatório ausente: nome"
+          },
+          "status": 400
+        },
+        {
+          "descricao": "Sem token",
+          "requisicao": {
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60
+          },
+          "resposta": {
+            "erro": "Token ausente ou inválido"
+          },
+          "status": 401
+        }
+      ]
     },
-
-    "exemplo_invalido": {
-      "titulo": "",
-      "data_entrega": "data-invalida",
-      "status": "qualquer",
-      "materia_id": -1
+    {
+      "metodo": "PUT",
+      "caminho": "/materias/:id",
+      "acesso": "dono",
+      "descricao": "Altera uma matéria. Só o dono pode.",
+      "exemplos": [
+        {
+          "descricao": "Dono altera a matéria",
+          "requisicao": {
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60
+          },
+          "resposta": {
+            "id": 1,
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60,
+            "usuarioId": 3
+          },
+          "status": 200
+        },
+        {
+          "descricao": "Carga horária inválida",
+          "requisicao": {
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": -5
+          },
+          "resposta": {
+            "erro": "A carga horária deve ser maior que zero"
+          },
+          "status": 400
+        },
+        {
+          "descricao": "Sem token",
+          "requisicao": {
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60
+          },
+          "resposta": {
+            "erro": "Token ausente ou inválido"
+          },
+          "status": 401
+        },
+        {
+          "descricao": "Logado, mas não é o dono",
+          "requisicao": {
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60
+          },
+          "resposta": {
+            "erro": "Sem permissão para alterar esta matéria"
+          },
+          "status": 403
+        },
+        {
+          "descricao": "Matéria não existe",
+          "requisicao": {
+            "nome": "Matemática",
+            "descricao": "Estudar funções",
+            "professor": "Carlos",
+            "carga_horaria": 60
+          },
+          "resposta": {
+            "erro": "Matéria não encontrada"
+          },
+          "status": 404
+        }
+      ]
     },
-
-    "regras": [
-      "O título é obrigatório.",
-      "A data de entrega deve ser válida.",
-      "O status deve ser pendente ou concluída.",
-      "A matéria deve existir e pertencer ao usuário.",
-      "Somente o dono pode editar ou remover a tarefa."
-    ]
-  }
+    {
+      "metodo": "DELETE",
+      "caminho": "/materias/:id",
+      "acesso": "dono",
+      "descricao": "Remove uma matéria. Só o dono pode.",
+      "exemplos": [
+        {
+          "descricao": "Dono remove a matéria",
+          "requisicao": null,
+          "resposta": null,
+          "status": 204
+        },
+        {
+          "descricao": "Sem token",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Token ausente ou inválido"
+          },
+          "status": 401
+        },
+        {
+          "descricao": "Logado, mas não é o dono",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Sem permissão para remover esta matéria"
+          },
+          "status": 403
+        },
+        {
+          "descricao": "Matéria não existe",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Matéria não encontrada"
+          },
+          "status": 404
+        }
+      ]
+    },
+    {
+      "metodo": "GET",
+      "caminho": "/tarefas",
+      "acesso": "logado",
+      "descricao": "Lista todas as tarefas do usuário logado.",
+      "exemplos": [
+        {
+          "descricao": "Lista as tarefas",
+          "requisicao": null,
+          "resposta": [
+            {
+              "id": 1,
+              "titulo": "Resolver exercícios",
+              "descricao": "Resolver questões sobre funções",
+              "data_entrega": "2026-10-20",
+              "status": "pendente",
+              "materiaId": 1,
+              "usuarioId": 3
+            }
+          ],
+          "status": 200
+        }
+      ]
+    },
+    {
+      "metodo": "GET",
+      "caminho": "/tarefas/:id",
+      "acesso": "dono",
+      "descricao": "Detalha uma tarefa. Só o dono pode.",
+      "exemplos": [
+        {
+          "descricao": "Tarefa existe",
+          "requisicao": null,
+          "resposta": {
+            "id": 1,
+            "titulo": "Resolver exercícios",
+            "descricao": "Resolver questões sobre funções",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1,
+            "usuarioId": 3
+          },
+          "status": 200
+        },
+        {
+          "descricao": "Tarefa não existe",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Tarefa não encontrada"
+          },
+          "status": 404
+        }
+      ]
+    },
+    {
+      "metodo": "POST",
+      "caminho": "/tarefas",
+      "acesso": "logado",
+      "descricao": "Cadastra uma tarefa vinculada a uma matéria do usuário logado.",
+      "exemplos": [
+        {
+          "descricao": "Dados válidos",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "descricao": "Resolver questões sobre funções",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1
+          },
+          "resposta": {
+            "id": 1,
+            "titulo": "Resolver exercícios",
+            "descricao": "Resolver questões sobre funções",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1,
+            "usuarioId": 3
+          },
+          "status": 201
+        },
+        {
+          "descricao": "Falta o título",
+          "requisicao": {
+            "descricao": "Resolver questões sobre funções",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1
+          },
+          "resposta": {
+            "erro": "Campo obrigatório ausente: titulo"
+          },
+          "status": 400
+        },
+        {
+          "descricao": "Status inválido",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "data_entrega": "2026-10-20",
+            "status": "qualquer",
+            "materiaId": 1
+          },
+          "resposta": {
+            "erro": "Status deve ser pendente ou concluída"
+          },
+          "status": 400
+        },
+        {
+          "descricao": "Sem token",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1
+          },
+          "resposta": {
+            "erro": "Token ausente ou inválido"
+          },
+          "status": 401
+        }
+      ]
+    },
+    {
+      "metodo": "PUT",
+      "caminho": "/tarefas/:id",
+      "acesso": "dono",
+      "descricao": "Altera uma tarefa. Só o dono pode.",
+      "exemplos": [
+        {
+          "descricao": "Dono altera a tarefa",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "descricao": "Resolver questões sobre funções",
+            "data_entrega": "2026-10-20",
+            "status": "concluída",
+            "materiaId": 1
+          },
+          "resposta": {
+            "id": 1,
+            "titulo": "Resolver exercícios",
+            "descricao": "Resolver questões sobre funções",
+            "data_entrega": "2026-10-20",
+            "status": "concluída",
+            "materiaId": 1,
+            "usuarioId": 3
+          },
+          "status": 200
+        },
+        {
+          "descricao": "Data inválida",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "data_entrega": "data-invalida",
+            "status": "pendente",
+            "materiaId": 1
+          },
+          "resposta": {
+            "erro": "Data de entrega inválida"
+          },
+          "status": 400
+        },
+        {
+          "descricao": "Sem token",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1
+          },
+          "resposta": {
+            "erro": "Token ausente ou inválido"
+          },
+          "status": 401
+        },
+        {
+          "descricao": "Logado, mas não é o dono",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1
+          },
+          "resposta": {
+            "erro": "Sem permissão para alterar esta tarefa"
+          },
+          "status": 403
+        },
+        {
+          "descricao": "Tarefa não existe",
+          "requisicao": {
+            "titulo": "Resolver exercícios",
+            "data_entrega": "2026-10-20",
+            "status": "pendente",
+            "materiaId": 1
+          },
+          "resposta": {
+            "erro": "Tarefa não encontrada"
+          },
+          "status": 404
+        }
+      ]
+    },
+    {
+      "metodo": "DELETE",
+      "caminho": "/tarefas/:id",
+      "acesso": "dono",
+      "descricao": "Remove uma tarefa. Só o dono pode.",
+      "exemplos": [
+        {
+          "descricao": "Dono remove a tarefa",
+          "requisicao": null,
+          "resposta": null,
+          "status": 204
+        },
+        {
+          "descricao": "Sem token",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Token ausente ou inválido"
+          },
+          "status": 401
+        },
+        {
+          "descricao": "Logado, mas não é o dono",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Sem permissão para remover esta tarefa"
+          },
+          "status": 403
+        },
+        {
+          "descricao": "Tarefa não existe",
+          "requisicao": null,
+          "resposta": {
+            "erro": "Tarefa não encontrada"
+          },
+          "status": 404
+        }
+      ]
+    }
+  ]
 }
